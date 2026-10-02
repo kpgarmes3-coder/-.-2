@@ -1,51 +1,48 @@
-const CACHE_NAME = 'bang-fai-offline-v4';
-const urlsToCache = [
-    './',
-    './index.html',
-    './manifest.json',
-    './42854.png',
-    'https://cdn.tailwindcss.com',
-    'https://unpkg.com/lucide@latest',
-    'https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@700;800&family=Kanit:wght@400;600;700;900&display=swap'
+const CACHE_NAME = 'meetang-timer-cache-v1';
+const assetsToCache = [
+  './',
+  './index.html',
+  './manifest.json',
+  './42854.png'
 ];
 
-self.addEventListener('install', event => {
-    self.skipWaiting();
-    event.waitUntil(
-        caches.open(CACHE_NAME)
-        .then(cache => {
-            return cache.addAll(urlsToCache);
-        })
-    );
+// 1. ติดตั้งและแคชไฟล์ทั้งหมดเก็บไว้
+self.addEventListener('install', (event) => {
+  event.waitUntil(
+    caches.open(CACHE_NAME).then((cache) => {
+      return cache.addAll(assetsToCache);
+    })
+  );
+  self.skipWaiting();
 });
 
-self.addEventListener('activate', event => {
-    event.waitUntil(
-        caches.keys().then(cacheNames => {
-            return Promise.all(
-                cacheNames.map(cacheName => {
-                    if (cacheName !== CACHE_NAME) {
-                        return caches.delete(cacheName);
-                    }
-                })
-            );
+// 2. เปิดใช้งานและล้างแคชเก่า
+self.addEventListener('activate', (event) => {
+  event.waitUntil(
+    caches.keys().then((keys) => {
+      return Promise.all(
+        keys.map((key) => {
+          if (key !== CACHE_NAME) {
+            return caches.delete(key);
+          }
         })
-    );
+      );
+    })
+  );
+  self.clientsClaim();
 });
 
-self.addEventListener('fetch', event => {
-    event.respondWith(
-        caches.match(event.request)
-        .then(response => {
-            if (response) {
-                return response;
-            }
-            return fetch(event.request).catch(() => {
-                // กรณีไม่มีเน็ตและเรียกหน้าเว็บหลัก ให้คืนค่า index.html จากแคช
-                if (event.request.mode === 'navigate') {
-                    return caches.match('./index.html');
-                }
-            });
-        })
-    );
+// 3. ดึงข้อมูลจากแคชมาแสดงผลทันทีเมื่อออฟไลน์
+self.addEventListener('fetch', (event) => {
+  event.respondWith(
+    caches.match(event.request).then((cachedResponse) => {
+      if (cachedResponse) {
+        return cachedResponse;
+      }
+      return fetch(event.request).catch(() => {
+        // กรณีไม่มีเน็ตและไม่มีในแคช ให้แสดงหน้า index สำรอง
+        return caches.match('./index.html');
+      });
+    })
+  );
 });
