@@ -10,15 +10,14 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="description" content="แอปพลิเคชันจับเวลาบั้งไฟมาตรฐานสูง แม่นยำระดับเสี้ยววินาที">
     
-    <!-- [SECURITY] เพิ่ม Content-Security-Policy (CSP) ป้องกันการถูกฝังโค้ดเถื่อน -->
+    <!-- [SECURITY] Content-Security-Policy (CSP) ป้องกันแฮกเกอร์ฝังโค้ด -->
     <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.tailwindcss.com https://unpkg.com https://js.stripe.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; frame-src https://js.stripe.com; img-src 'self' data: https:; connect-src 'self' https://api.stripe.com;">
     
     <title>𝙼𝚎𝚎𝚝𝚊𝚗𝚐.𝙱𝚢วิน จับเวลาบั้งไฟ (หน่วยวินาทีบริสุทธิ์)</title>
     
-    <!-- [SECURITY] โหลด Manifest จากไฟล์จริง ไม่ใช้ Blob -->
+    <!-- ดึง Manifest มาตรฐาน PWA -->
     <link rel="manifest" href="manifest.json">
     
-    <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -27,18 +26,8 @@
     <script async src="https://js.stripe.com/v3/buy-button.js"></script>
 
     <style>
-        body {
-            font-family: 'Kanit', sans-serif;
-            background-color: #07090e;
-            color: #f3f4f6;
-            user-select: none;
-            -webkit-user-select: none;
-            touch-action: manipulation;
-        }
-        .font-mono-num {
-            font-family: 'JetBrains Mono', monospace;
-            font-variant-numeric: tabular-nums;
-        }
+        body { font-family: 'Kanit', sans-serif; background-color: #07090e; color: #f3f4f6; user-select: none; -webkit-user-select: none; touch-action: manipulation; }
+        .font-mono-num { font-family: 'JetBrains Mono', monospace; font-variant-numeric: tabular-nums; }
         .glow-yellow { text-shadow: 0 0 20px rgba(255, 230, 0, 0.6), 0 0 40px rgba(255, 230, 0, 0.3); }
         .glow-green { box-shadow: 0 0 30px rgba(0, 255, 136, 0.4); }
         .glow-red { box-shadow: 0 0 30px rgba(255, 46, 77, 0.4); }
@@ -47,189 +36,384 @@
             50% { border-color: rgba(0, 255, 136, 0.3); box-shadow: 0 0 10px rgba(0, 255, 136, 0.2); }
         }
         .timer-running { animation: pulse-border 1.5s infinite ease-in-out; }
+        .modal-enter { opacity: 0; transform: scale(0.95); }
+        .modal-enter-active { opacity: 1; transform: scale(1); transition: opacity 200ms, transform 200ms; }
+        .modal-exit { opacity: 1; transform: scale(1); }
+        .modal-exit-active { opacity: 0; transform: scale(0.95); transition: opacity 200ms, transform 200ms; }
     </style>
 </head>
 <body class="min-h-screen flex flex-col justify-between p-3 sm:p-6 bg-slate-950 text-slate-100">
 
-    <!-- โครงสร้าง HTML ใช้ตัวเดิมของคุณทั้งหมด (ผมขอข้ามส่วน UI ไปที่ส่วน Script ด้านล่างเพื่อประหยัดพื้นที่ แต่คุณสามารถนำ UI เดิมมาใส่ตรงนี้ได้เลย) -->
-    
-    <!-- คัดลอกส่วน <header>, <main>, <footer> ของคุณมาใส่ตรงนี้ได้เลย (เหมือนเดิม 100%) -->
-    <!-- [ข้อควรระวังเรื่อง UI]: ลิงก์ภายนอกทั้งหมดของคุณที่มี target="_blank" ต้องเพิ่ม rel="noopener noreferrer" เพื่อความปลอดภัย เช่น: -->
-    <!-- <a href="..." target="_blank" rel="noopener noreferrer" class="...">...</a> -->
+    <header class="w-full max-w-5xl mx-auto flex flex-col sm:flex-row items-start sm:items-center justify-between pb-4 border-b border-slate-800 gap-4">
+        <div class="flex items-center space-x-3">
+            <div class="p-2.5 bg-gradient-to-br from-amber-500 to-red-600 rounded-xl text-black shadow-lg">
+                <i data-lucide="flame" class="w-7 h-7 stroke-[2.5]"></i>
+            </div>
+            <div>
+                <h1 class="text-xl sm:text-2xl font-black tracking-wide text-amber-400 flex items-center flex-wrap gap-2">
+                    𝙼𝚎𝚎𝚝𝚊𝚗𝚐.𝙱𝚢วิน จับเวลาบั้งไฟ 
+                    <span class="text-xs font-semibold px-2 py-0.5 bg-red-500/20 text-red-400 border border-red-500/40 rounded-full">หน่วยวินาทีบริสุทธิ์</span>
+                </h1>
+                <div class="mt-1.5 inline-flex items-center space-x-1.5 bg-emerald-500/10 text-emerald-400 text-xs px-2.5 py-0.5 rounded-full border border-emerald-500/30 font-bold">
+                    <i data-lucide="shield-check" class="w-3.5 h-3.5"></i>
+                    <span>ทีมงานน้องมีตังค์ ปลอดภัย 100% แม่นยำเที่ยงตรง</span>
+                </div>
+            </div>
+        </div>
+        <div class="flex items-center space-x-2 w-full sm:w-auto justify-end">
+            <button id="soundToggleBtn" onclick="toggleSound()" class="p-2.5 rounded-xl bg-slate-800/80 hover:bg-slate-700 text-slate-300 transition flex items-center space-x-1 border border-slate-700 text-xs font-semibold">
+                <i id="soundIcon" data-lucide="volume-2" class="w-4 h-4 text-emerald-400"></i>
+                <span id="soundLabel" class="hidden sm:inline">เสียงเปิด</span>
+            </button>
+        </div>
+    </header>
+
+    <main class="w-full max-w-5xl mx-auto py-4 space-y-6 flex-1">
+        <div class="bg-amber-500/10 border border-amber-500/30 rounded-xl p-2.5 text-center text-amber-300 text-xs sm:text-sm font-medium flex items-center justify-center gap-2">
+            <i data-lucide="alert-triangle" class="w-4 h-4 shrink-0 text-amber-400"></i>
+            <span>กฎกติกา: แสดงเวลาเป็น <b>"วินาทีล้วน"</b> เช่น 185.50 วินาที (ไม่ใช้หน่วยนาที เพื่อความโปร่งใส ป้องกันการโกง)</span>
+        </div>
+
+        <div id="timerCard" onclick="handleDisplayClick(event)" class="relative cursor-pointer bg-slate-900/90 border-2 border-slate-800 rounded-3xl p-6 sm:p-10 text-center shadow-2xl transition-all duration-200 hover:border-slate-700 select-none">
+            <div class="absolute top-4 left-4 sm:top-6 sm:left-6 flex items-center space-x-2">
+                <span id="statusDot" class="w-3.5 h-3.5 rounded-full bg-slate-500"></span>
+                <span id="statusText" class="text-xs sm:text-sm font-bold tracking-wider text-slate-400 uppercase">พร้อมจับเวลา</span>
+            </div>
+            <div class="text-xs sm:text-sm font-bold text-amber-400 uppercase tracking-widest mt-4 sm:mt-2">
+                หน่วยเวลา: วินาที (Seconds Only)
+            </div>
+            <div class="my-4 sm:my-8">
+                <div class="font-mono-num font-black text-6xl sm:text-8xl md:text-9xl tracking-tight text-amber-300 glow-yellow leading-none">
+                    <span id="secondsDisplay">0</span><span class="text-4xl sm:text-6xl md:text-7xl text-amber-400/80">.</span><span id="decimalsDisplay" class="text-4xl sm:text-6xl md:text-7xl text-amber-400/80">00</span>
+                </div>
+                <div class="text-sm sm:text-base font-semibold text-slate-400 mt-2">วินาที (SEC)</div>
+            </div>
+            <div class="text-xs text-slate-500 sm:text-slate-400 mt-2 font-light">
+                <span class="hidden sm:inline">กด <kbd class="px-2 py-0.5 bg-slate-800 border border-slate-700 rounded text-amber-300 font-mono">Space</kbd> / <kbd class="px-2 py-0.5 bg-slate-800 border border-slate-700 rounded text-amber-300 font-mono">ปุ่มเพิ่ม-ลดเสียง</kbd> หรือ</span> แตะที่กล่องนี้เพื่อ เริ่ม / หยุด เวลาทันที
+            </div>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4">
+            <button id="mainStartBtn" onclick="toggleTimer(event)" class="sm:col-span-1 py-5 px-6 rounded-2xl bg-emerald-500 hover:bg-emerald-400 active:scale-95 text-slate-950 font-black text-2xl sm:text-3xl shadow-lg glow-green transition flex items-center justify-center space-x-3 z-10 relative">
+                <i id="mainStartIcon" data-lucide="play" class="w-8 h-8 fill-current"></i>
+                <span id="mainStartText">เริ่มจับเวลา</span>
+            </button>
+            <button id="recordBtn" onclick="recordFlight()" class="py-4 px-6 rounded-2xl bg-amber-500 hover:bg-amber-400 active:scale-95 text-slate-950 font-bold text-lg sm:text-xl shadow-md transition flex items-center justify-center space-x-2 border border-amber-300 z-10 relative">
+                <i data-lucide="bookmark-plus" class="w-6 h-6"></i>
+                <span>บันทึกเวลา (Enter)</span>
+            </button>
+            <button id="resetBtn" onclick="resetTimer()" class="py-4 px-6 rounded-2xl bg-slate-800 hover:bg-slate-700 active:scale-95 text-slate-200 font-bold text-lg sm:text-xl border border-slate-700 transition flex items-center justify-center space-x-2 z-10 relative">
+                <i data-lucide="rotate-ccw" class="w-6 h-6 text-slate-400"></i>
+                <span>รีเซ็ต (R)</span>
+            </button>
+        </div>
+
+        <div class="bg-slate-900 border border-slate-800 rounded-2xl p-4 sm:p-5 shadow-lg relative z-20">
+            <label for="rocketNameInput" class="block text-xs font-bold text-amber-400 uppercase tracking-wider mb-2">ชื่อบั้งไฟ / ค่ายบั้งไฟ (ใส่ก่อนหรือหลังจับเวลาได้):</label>
+            <div class="flex flex-col sm:flex-row gap-2">
+                <div class="relative flex-1">
+                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-500">
+                        <i data-lucide="rocket" class="w-5 h-5"></i>
+                    </div>
+                    <input type="text" id="rocketNameInput" placeholder="ตัวอย่าง: ค่ายเพชรนาแก - บั้งไฟแสน #1" class="w-full pl-10 pr-4 py-3 bg-slate-950 border border-slate-700 rounded-xl text-slate-100 placeholder-slate-500 focus:outline-none focus:border-amber-400 font-medium text-base" onkeydown="handleInputKey(event)">
+                </div>
+                <div class="flex items-center gap-1.5 overflow-x-auto py-1 sm:py-0">
+                    <button type="button" onclick="setPreset('บั้งไฟหมื่น')" class="px-2.5 py-1.5 text-xs bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-lg whitespace-nowrap border border-slate-700">+ บั้งไฟหมื่น</button>
+                    <button type="button" onclick="setPreset('บั้งไฟแสน')" class="px-2.5 py-1.5 text-xs bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-lg whitespace-nowrap border border-slate-700">+ บั้งไฟแสน</button>
+                    <button type="button" onclick="setPreset('บั้งไฟล้าน')" class="px-2.5 py-1.5 text-xs bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-lg whitespace-nowrap border border-slate-700">+ บั้งไฟล้าน</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="bg-slate-900 border border-slate-800 rounded-2xl p-4 sm:p-6 shadow-lg space-y-4">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-800 pb-3">
+                <div class="flex items-center space-x-2">
+                    <i data-lucide="trophy" class="w-6 h-6 text-amber-400"></i>
+                    <h2 class="text-lg font-bold text-slate-100">ตารางบันทึกผลการบิน (<span id="recordCount">0</span> รายการ)</h2>
+                </div>
+                <div class="flex flex-wrap items-center gap-2">
+                    <button onclick="copySummaryText()" class="px-3 py-1.5 text-xs font-semibold bg-emerald-600/20 hover:bg-emerald-600/30 text-emerald-400 border border-emerald-500/40 rounded-lg flex items-center space-x-1 transition">
+                        <i data-lucide="copy" class="w-3.5 h-3.5"></i><span>คัดลอกสรุปผล</span>
+                    </button>
+                    <button onclick="exportCSV()" class="px-3 py-1.5 text-xs font-semibold bg-blue-600/20 hover:bg-blue-600/30 text-blue-400 border border-blue-500/40 rounded-lg flex items-center space-x-1 transition">
+                        <i data-lucide="download" class="w-3.5 h-3.5"></i><span>โหลด CSV</span>
+                    </button>
+                    <button onclick="clearAllLogs()" class="px-3 py-1.5 text-xs font-semibold bg-red-600/20 hover:bg-red-600/30 text-red-400 border border-red-500/40 rounded-lg flex items-center space-x-1 transition">
+                        <i data-lucide="trash-2" class="w-3.5 h-3.5"></i><span>ล้างทั้งหมด</span>
+                    </button>
+                </div>
+            </div>
+
+            <div id="topRecordCard" class="hidden bg-gradient-to-r from-amber-500/10 via-amber-500/5 to-transparent border border-amber-500/30 p-3.5 rounded-xl flex items-center justify-between">
+                <div class="flex items-center space-x-3">
+                    <div class="p-2 bg-amber-500/20 rounded-lg text-amber-400"><i data-lucide="award" class="w-6 h-6"></i></div>
+                    <div>
+                        <div class="text-xs text-amber-400 font-bold uppercase tracking-wider">สถิติสูงสุดวันนี้</div>
+                        <div id="topTeamName" class="text-sm font-bold text-slate-200">-</div>
+                    </div>
+                </div>
+                <div class="text-right">
+                    <span id="topTime" class="font-mono-num text-xl sm:text-2xl font-black text-amber-300">0.00</span>
+                    <span class="text-xs text-amber-400 font-semibold ml-1">วินาที</span>
+                </div>
+            </div>
+
+            <div class="overflow-x-auto rounded-xl border border-slate-800">
+                <table class="w-full text-left text-sm text-slate-300">
+                    <thead class="bg-slate-950 text-slate-400 uppercase text-xs font-semibold border-b border-slate-800">
+                        <tr>
+                            <th class="px-4 py-3 text-center w-12">อันดับ</th>
+                            <th class="px-4 py-3">ชื่อบั้งไฟ / ค่าย</th>
+                            <th class="px-4 py-3 text-right">เวลาบินสถิติ (วินาที)</th>
+                            <th class="px-4 py-3 text-center hidden sm:table-cell">เวลาบันทึก</th>
+                            <th class="px-4 py-3 text-center w-16">ลบ</th>
+                        </tr>
+                    </thead>
+                    <tbody id="logsTableBody" class="divide-y divide-slate-800/60 bg-slate-900/50"></tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="bg-slate-900 border border-slate-800 rounded-2xl p-4 sm:p-6 shadow-lg space-y-6">
+            <h2 class="text-lg font-bold text-amber-400 border-b border-slate-800 pb-3 flex items-center space-x-2">
+                <i data-lucide="users" class="w-6 h-6"></i><span>ช่องทางการติดต่อ และ สนับสนุน</span>
+            </h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div class="space-y-4">
+                    <h3 class="text-sm font-bold text-slate-300 uppercase tracking-wider mb-2">ทีมงานน้องมีตังค์ & ช่างเจียง</h3>
+                    <div class="flex flex-col gap-2">
+                        <a href="https://www.tiktok.com/@nongmeetang90?_r=1&_t=ZS-9ACftN1qbFE" target="_blank" rel="noopener noreferrer" class="flex items-center space-x-3 p-3 rounded-xl bg-slate-800/50 hover:bg-slate-800 border border-slate-700/50 transition">
+                            <i data-lucide="video" class="w-5 h-5 text-pink-400"></i><span class="text-sm font-medium text-slate-200">TikTok: ค่ายน้องมีตังค์</span>
+                        </a>
+                        <a href="https://www.facebook.com/share/1HPX1BzfU9/" target="_blank" rel="noopener noreferrer" class="flex items-center space-x-3 p-3 rounded-xl bg-slate-800/50 hover:bg-slate-800 border border-slate-700/50 transition">
+                            <i data-lucide="facebook" class="w-5 h-5 text-blue-400"></i><span class="text-sm font-medium text-slate-200">Facebook: ช่างเจียง</span>
+                        </a>
+                        <a href="tel:0914732609" class="flex items-center space-x-3 p-3 rounded-xl bg-slate-800/50 hover:bg-slate-800 border border-slate-700/50 transition">
+                            <i data-lucide="phone" class="w-5 h-5 text-emerald-400"></i><span class="text-sm font-medium text-slate-200">โทร: 0914732609 (ช่างเจียง)</span>
+                        </a>
+                    </div>
+                    <h3 class="text-sm font-bold text-slate-300 uppercase tracking-wider mb-2 mt-6">ผู้พัฒนา</h3>
+                    <div class="flex flex-col gap-2">
+                        <a href="https://www.facebook.com/share/1CiGuFFWnU/" target="_blank" rel="noopener noreferrer" class="flex items-center space-x-3 p-3 rounded-xl bg-slate-800/50 hover:bg-slate-800 border border-slate-700/50 transition">
+                            <i data-lucide="facebook" class="w-5 h-5 text-blue-400"></i><span class="text-sm font-medium text-slate-200">Facebook: ผู้พัฒนา</span>
+                        </a>
+                        <a href="https://www.tiktok.com/@peerapatthongramun_56?_r=1&_t=ZS-9ACfpqZF52C" target="_blank" rel="noopener noreferrer" class="flex items-center space-x-3 p-3 rounded-xl bg-slate-800/50 hover:bg-slate-800 border border-slate-700/50 transition">
+                            <i data-lucide="video" class="w-5 h-5 text-pink-400"></i><span class="text-sm font-medium text-slate-200">TikTok: ผู้พัฒนา</span>
+                        </a>
+                    </div>
+                </div>
+                <div class="space-y-4">
+                    <h3 class="text-sm font-bold text-slate-300 uppercase tracking-wider mb-2">สนับสนุนผลงาน (Donate)</h3>
+                    <div class="bg-slate-950 border border-slate-800 rounded-xl p-5 flex flex-col items-center justify-center space-y-5 text-center h-full">
+                        <div class="w-full">
+                            <p class="text-xs text-slate-400 mb-3">สนับสนุนผ่านบัตรเครดิต/เดบิต (Stripe)</p>
+                            <div class="flex justify-center py-2 rounded-lg relative z-10">
+                                <stripe-buy-button buy-button-id="buy_btn_1ULtV7Dx0V34k6KYZAj8rVZx" publishable-key="pk_live_51U7FRlDx0V34k6KY7OuIk6MaTMWmenvuYa2iOYc4aSaig5LyXC0n3NpstjRzd9YhLjDfLykG1AmM5LW0IPKE9yUt003ZdeDNPD"></stripe-buy-button>
+                            </div>
+                            <a href="https://buy.stripe.com/14A6oH04U4YV0fZ0WBgw000" target="_blank" rel="noopener noreferrer" class="text-[11px] text-blue-400 hover:underline mt-2 inline-block">ลิงก์สำรอง (หน้าชำระเงิน Stripe)</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <div id="toast" class="fixed top-10 left-1/2 transform -translate-x-1/2 -translate-y-20 opacity-0 transition-all duration-300 bg-emerald-500 text-slate-950 px-5 py-3 rounded-xl font-bold shadow-2xl flex items-center space-x-2 z-50 pointer-events-none">
+        <i data-lucide="check-circle-2" class="w-5 h-5"></i>
+        <span id="toastMessage">แจ้งเตือน</span>
+    </div>
+
+    <footer class="w-full max-w-5xl mx-auto pt-6 pb-4 text-center border-t border-slate-800/80 flex flex-col items-center justify-center space-y-2">
+        <div class="text-xs text-slate-500">ระบบจับเวลาบั้งไฟมาตรฐานสนามแข่งขัน &copy; หน่วยวินาทีแม่นยำสูง ทีมงานน้องมีตังค์ (ใช้งานออฟไลน์ได้)</div>
+        <button onclick="toggleLegalModal()" class="text-xs text-emerald-400/80 hover:text-emerald-400 flex items-center space-x-1 border-b border-emerald-400/30 pb-0.5 transition">
+            <i data-lucide="scale" class="w-3.5 h-3.5"></i><span>ข้อตกลงและมาตรฐานการทำงานของระบบจับเวลา (อ่านรายละเอียด)</span>
+        </button>
+    </footer>
+
+    <div id="legalModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm hidden">
+        <div class="bg-slate-900 border border-slate-700 w-full max-w-2xl max-h-[85vh] rounded-2xl shadow-2xl flex flex-col m-4">
+            <div class="flex items-center justify-between p-4 sm:p-5 border-b border-slate-800 bg-slate-950 rounded-t-2xl">
+                <h3 class="text-lg font-bold text-amber-400 flex items-center space-x-2"><i data-lucide="scale" class="w-5 h-5"></i><span>เอกสารรับรองมาตรฐานระบบจับเวลา</span></h3>
+                <button onclick="toggleLegalModal()" class="text-slate-400 hover:text-white p-1 rounded-lg hover:bg-slate-800 transition"><i data-lucide="x" class="w-5 h-5"></i></button>
+            </div>
+            <div class="p-5 sm:p-6 overflow-y-auto space-y-4 text-sm text-slate-300 leading-relaxed font-light">
+                <div class="p-4 bg-emerald-900/20 border border-emerald-500/30 rounded-xl mb-4">
+                    <strong class="text-emerald-400 block mb-1">ประกาศความเป็นอิสระและโปร่งใส (Transparency & Independence)</strong>
+                    <p>ระบบแอปพลิเคชันนี้ประมวลผลแบบ Client-Side ไม่มีการส่งข้อมูลเวลาผ่านอินเทอร์เน็ตไปเปลี่ยนแปลงที่เซิร์ฟเวอร์ใดๆ เพื่อรับประกันว่าไม่มีการแทรกแซง</p>
+                </div>
+            </div>
+            <div class="p-4 border-t border-slate-800 bg-slate-950 rounded-b-2xl text-center">
+                <button onclick="toggleLegalModal()" class="px-6 py-2 bg-slate-800 hover:bg-slate-700 text-white font-semibold rounded-xl transition border border-slate-700 w-full sm:w-auto">รับทราบและปิดเอกสาร</button>
+            </div>
+        </div>
+    </div>
 
     <script>
-        // ==========================================
-        // SECURITY ENHANCEMENT: ป้องกัน XSS (Cross-Site Scripting)
-        // ==========================================
+        // ป้องกัน XSS
         function escapeHTML(str) {
-            return str.replace(/[&<>'"]/g, 
-                tag => ({
-                    '&': '&amp;',
-                    '<': '&lt;',
-                    '>': '&gt;',
-                    "'": '&#39;',
-                    '"': '&quot;'
-                }[tag] || tag)
-            );
+            return str.replace(/[&<>'"]/g, tag => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' }[tag] || tag));
         }
 
-        // ตัวแปรระบบต่างๆ (เหมือนเดิม)
-        let startTime = 0;
-        let elapsedTime = 0;
-        let timerInterval = null;
-        let isRunning = false;
-        let soundEnabled = true;
-        let flightLogs = [];
-        let audioCtx = null;
-
+        let startTime = 0, elapsedTime = 0, timerInterval = null, isRunning = false, soundEnabled = true, flightLogs = [], audioCtx = null;
         lucide.createIcons();
 
-        // ฟังก์ชันระบบเสียงและการสั่น (เหมือนเดิม)
-        function initAudio() { /* ... โค้ดเดิม ... */ }
-        function playBeep(freq = 800, type = 'sine', duration = 0.1) { /* ... โค้ดเดิม ... */ }
+        function initAudio() {
+            if (!audioCtx) { const AudioContext = window.AudioContext || window.webkitAudioContext; if (AudioContext) audioCtx = new AudioContext(); }
+            if (audioCtx && audioCtx.state === 'suspended') audioCtx.resume();
+        }
+        function playBeep(freq = 800, type = 'sine', duration = 0.1) {
+            if (!soundEnabled) return;
+            try {
+                initAudio(); if (!audioCtx) return;
+                const osc = audioCtx.createOscillator(), gain = audioCtx.createGain();
+                osc.type = type; osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+                gain.gain.setValueAtTime(0.15, audioCtx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + duration);
+                osc.connect(gain); gain.connect(audioCtx.destination);
+                osc.start(); osc.stop(audioCtx.currentTime + duration);
+            } catch (e) { console.log("Audio not supported"); }
+        }
         function vibrate(pattern = [50]) { if (navigator.vibrate) navigator.vibrate(pattern); }
 
-        function updateDisplay() { /* ... โค้ดเดิม ... */ }
-        function toggleTimer(e) { /* ... โค้ดเดิม ... */ }
-        function startTimer() { /* ... โค้ดเดิม ... */ }
-        function stopTimer() { /* ... โค้ดเดิม ... */ }
-        function resetTimer() { /* ... โค้ดเดิม ... */ }
-        function handleDisplayClick(event) { /* ... โค้ดเดิม ... */ }
-        function toggleSound() { /* ... โค้ดเดิม ... */ }
-
-        // ==========================================
-        // ปรับปรุงฟังก์ชันบันทึกเวลา (คัดกรองข้อมูลก่อนบันทึก)
-        // ==========================================
-        function recordFlight() {
-            const currentSeconds = (elapsedTime / 1000).toFixed(2);
-            if (parseFloat(currentSeconds) <= 0) {
-                showToast('กรุณาเริ่มจับเวลาก่อนทำการบันทึก', 'bg-amber-500');
-                return;
-            }
-
-            const inputField = document.getElementById('rocketNameInput');
-            // ทำความสะอาดข้อความก่อนนำไปใช้
-            let rawName = inputField.value.trim();
-            let safeName = rawName ? escapeHTML(rawName) : `บั้งไฟลำที่ ${flightLogs.length + 1}`;
-
-            const now = new Date();
-            const timeString = now.toLocaleTimeString('th-TH', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
-
-            const newLog = {
-                id: Date.now(),
-                name: safeName, // ใช้ชื่อที่ทำความสะอาดแล้ว
-                seconds: parseFloat(currentSeconds),
-                secondsText: `${currentSeconds} วินาที`,
-                timestamp: timeString
-            };
-
-            flightLogs.push(newLog); 
-            saveToLocalStorage();
-            renderLogsTable();
-
-            playBeep(1200, 'sine', 0.15);
-            vibrate([40, 80]);
-            showToast(`บันทึกเวลาสำเร็จ`, 'bg-emerald-500');
-            
-            inputField.value = '';
+        function updateDisplay() {
+            if (isRunning) { elapsedTime = performance.now() - startTime; timerInterval = requestAnimationFrame(updateDisplay); }
+            const totalSecondsFloat = elapsedTime / 1000;
+            const formattedString = totalSecondsFloat.toFixed(2);
+            const [secPart, decPart] = formattedString.split('.');
+            document.getElementById('secondsDisplay').innerText = secPart;
+            document.getElementById('decimalsDisplay').innerText = decPart;
         }
 
-        function setPreset(presetText) { /* ... โค้ดเดิม ... */ }
-        function deleteLog(id) { /* ... โค้ดเดิม ... */ }
-        function clearAllLogs() { /* ... โค้ดเดิม ... */ }
-        function saveToLocalStorage() { localStorage.setItem('bangfaiLogs_secure', JSON.stringify(flightLogs)); }
-        function loadFromLocalStorage() {
-            const saved = localStorage.getItem('bangfaiLogs_secure');
-            if (saved) {
-                try { flightLogs = JSON.parse(saved); } 
-                catch (e) { flightLogs = []; }
-            }
-            renderLogsTable();
+        function toggleTimer(e) { if (e) e.stopPropagation(); initAudio(); if (isRunning) stopTimer(); else startTimer(); }
+
+        function startTimer() {
+            if (isRunning) return;
+            isRunning = true; startTime = performance.now() - elapsedTime; timerInterval = requestAnimationFrame(updateDisplay);
+            document.getElementById('timerCard').classList.add('timer-running');
+            document.getElementById('statusDot').className = 'w-3.5 h-3.5 rounded-full bg-emerald-400 animate-ping';
+            document.getElementById('statusText').innerText = 'กำลังจับเวลาอยู่...';
+            document.getElementById('statusText').className = 'text-xs sm:text-sm font-bold tracking-wider text-emerald-400 uppercase';
+            document.getElementById('mainStartBtn').className = 'sm:col-span-1 py-5 px-6 rounded-2xl bg-red-600 hover:bg-red-500 active:scale-95 text-white font-black text-2xl sm:text-3xl shadow-lg glow-red transition flex items-center justify-center space-x-3 z-10 relative';
+            document.getElementById('mainStartText').innerText = 'หยุดเวลา';
+            document.getElementById('mainStartIcon').setAttribute('data-lucide', 'square');
+            lucide.createIcons(); playBeep(1000, 'sine', 0.12); vibrate([70]);
         }
 
-        // ==========================================
-        // ปรับปรุงฟังก์ชันตาราง (ปิดช่องโหว่ DOM XSS)
-        // ==========================================
-        function renderLogsTable() {
-            const tbody = document.getElementById('logsTableBody');
-            const recordCount = document.getElementById('recordCount');
-            const topRecordCard = document.getElementById('topRecordCard');
-            
-            recordCount.innerText = flightLogs.length;
-            tbody.innerHTML = '';
+        function stopTimer() {
+            if (!isRunning) return;
+            isRunning = false; cancelAnimationFrame(timerInterval);
+            document.getElementById('timerCard').classList.remove('timer-running');
+            document.getElementById('statusDot').className = 'w-3.5 h-3.5 rounded-full bg-red-500';
+            document.getElementById('statusText').innerText = 'หยุดเวลาแล้ว';
+            document.getElementById('statusText').className = 'text-xs sm:text-sm font-bold tracking-wider text-red-400 uppercase';
+            document.getElementById('mainStartBtn').className = 'sm:col-span-1 py-5 px-6 rounded-2xl bg-emerald-500 hover:bg-emerald-400 active:scale-95 text-slate-950 font-black text-2xl sm:text-3xl shadow-lg glow-green transition flex items-center justify-center space-x-3 z-10 relative';
+            document.getElementById('mainStartText').innerText = 'เริ่มจับเวลาต่อ';
+            document.getElementById('mainStartIcon').setAttribute('data-lucide', 'play');
+            lucide.createIcons(); playBeep(450, 'square', 0.2); vibrate([40, 40]);
+        }
 
-            if (flightLogs.length === 0) {
-                tbody.innerHTML = `
-                    <tr id="emptyRow">
-                        <td colspan="5" class="px-4 py-8 text-center text-slate-500 font-medium">
-                            <i data-lucide="clock" class="w-8 h-8 mx-auto mb-2 opacity-40"></i>
-                            ยังไม่มีการบันทึกเวลา
-                        </td>
-                    </tr>`;
-                topRecordCard.classList.add('hidden');
-                lucide.createIcons();
-                return;
-            }
+        function resetTimer() {
+            if (isRunning) stopTimer();
+            elapsedTime = 0; document.getElementById('secondsDisplay').innerText = '0'; document.getElementById('decimalsDisplay').innerText = '00';
+            document.getElementById('statusDot').className = 'w-3.5 h-3.5 rounded-full bg-slate-500';
+            document.getElementById('statusText').innerText = 'พร้อมจับเวลา'; document.getElementById('statusText').className = 'text-xs sm:text-sm font-bold tracking-wider text-slate-400 uppercase';
+            document.getElementById('mainStartText').innerText = 'เริ่มจับเวลา'; playBeep(600, 'triangle', 0.1); vibrate([30]);
+        }
 
-            const sortedLogs = [...flightLogs].sort((a, b) => b.seconds - a.seconds);
-            const topRecord = sortedLogs[0];
-            
-            // ใช้ textContent แทน innerHTML ในส่วนที่เอาข้อมูลผู้ใช้มาโชว์
-            document.getElementById('topTeamName').textContent = topRecord.name;
-            document.getElementById('topTime').innerText = topRecord.seconds.toFixed(2);
-            topRecordCard.classList.remove('hidden');
+        function handleDisplayClick(event) { if (event.target.tagName.toLowerCase() !== 'input' && event.target.tagName.toLowerCase() !== 'button' && event.target.tagName.toLowerCase() !== 'stripe-buy-button') toggleTimer(); }
 
-            sortedLogs.forEach((log, index) => {
-                const tr = document.createElement('tr');
-                tr.className = "hover:bg-slate-800/50 transition duration-150";
-                
-                let rankStyle = "text-slate-400";
-                if(index === 0) rankStyle = "text-amber-400 font-bold bg-amber-400/10 rounded-lg";
-                if(index === 1) rankStyle = "text-slate-300 font-bold bg-slate-300/10 rounded-lg";
-                if(index === 2) rankStyle = "text-orange-400 font-bold bg-orange-400/10 rounded-lg";
-
-                // ชื่อค่ายถูก escapeHTML มาแล้วตอนบันทึก จึงปลอดภัยต่อการใส่ใน template literal
-                tr.innerHTML = `
-                    <td class="px-4 py-3 text-center">
-                        <div class="w-8 h-8 mx-auto flex items-center justify-center ${rankStyle}">${index + 1}</div>
-                    </td>
-                    <td class="px-4 py-3 font-medium text-slate-200">${log.name}</td>
-                    <td class="px-4 py-3 text-right font-mono-num font-bold text-emerald-400">${log.seconds.toFixed(2)}</td>
-                    <td class="px-4 py-3 text-center text-slate-500 hidden sm:table-cell">${log.timestamp}</td>
-                    <td class="px-4 py-3 text-center">
-                        <button onclick="deleteLog(${log.id})" class="p-1.5 text-red-400 hover:text-red-300 hover:bg-red-500/20 rounded transition" title="ลบสถิตินี้">
-                            <i data-lucide="trash" class="w-4 h-4"></i>
-                        </button>
-                    </td>
-                `;
-                tbody.appendChild(tr);
-            });
-
+        function toggleSound() {
+            soundEnabled = !soundEnabled;
+            const icon = document.getElementById('soundIcon'), label = document.getElementById('soundLabel');
+            if (soundEnabled) { icon.setAttribute('data-lucide', 'volume-2'); icon.className = 'w-4 h-4 text-emerald-400'; label.innerText = 'เสียงเปิด'; playBeep(800, 'sine', 0.1); }
+            else { icon.setAttribute('data-lucide', 'volume-x'); icon.className = 'w-4 h-4 text-slate-500'; label.innerText = 'เสียงปิด'; }
             lucide.createIcons();
         }
 
-        // ฟังก์ชันคัดลอก, โหลด CSV, โชว์ Toast (ใช้โค้ดเดิมได้เลย)
-        /* ... โค้ดเดิม ... */
+        function recordFlight() {
+            const currentSeconds = (elapsedTime / 1000).toFixed(2);
+            if (parseFloat(currentSeconds) <= 0) return showToast('กรุณาเริ่มจับเวลาก่อนทำการบันทึก', 'bg-amber-500');
+            const inputField = document.getElementById('rocketNameInput');
+            let safeName = inputField.value.trim() ? escapeHTML(inputField.value.trim()) : `บั้งไฟลำที่ ${flightLogs.length + 1}`;
+            
+            flightLogs.push({ id: Date.now(), name: safeName, seconds: parseFloat(currentSeconds), secondsText: `${currentSeconds} วินาที`, timestamp: new Date().toLocaleTimeString('th-TH') });
+            saveToLocalStorage(); renderLogsTable(); playBeep(1200, 'sine', 0.15); vibrate([40, 80]);
+            showToast(`บันทึกเวลาสำเร็จ`, 'bg-emerald-500'); inputField.value = '';
+        }
 
-        // Event Listener การกดปุ่ม
-        document.addEventListener('keydown', (e) => { /* ... โค้ดเดิม ... */ });
+        function setPreset(presetText) { const inputField = document.getElementById('rocketNameInput'); inputField.value = inputField.value.trim() ? inputField.value + ' ' + presetText : presetText + ' '; inputField.focus(); }
+        function deleteLog(id) { if(confirm("คุณต้องการลบสถิตินี้ใช่หรือไม่?")) { flightLogs = flightLogs.filter(log => log.id !== id); saveToLocalStorage(); renderLogsTable(); showToast("ลบข้อมูลสำเร็จ", "bg-red-500"); } }
+        function clearAllLogs() { if (flightLogs.length === 0) return; if(confirm("แน่ใจหรือไม่ว่าต้องการล้างสถิติทั้งหมด?")) { flightLogs = []; saveToLocalStorage(); renderLogsTable(); showToast("ล้างข้อมูลทั้งหมดแล้ว", "bg-amber-500"); } }
+        function saveToLocalStorage() { localStorage.setItem('bangfaiLogs_secure', JSON.stringify(flightLogs)); }
+        function loadFromLocalStorage() { const saved = localStorage.getItem('bangfaiLogs_secure'); if (saved) { try { flightLogs = JSON.parse(saved); } catch (e) { flightLogs = []; } } renderLogsTable(); }
 
-        window.onload = () => {
-            loadFromLocalStorage();
-        };
+        function renderLogsTable() {
+            const tbody = document.getElementById('logsTableBody'), topRecordCard = document.getElementById('topRecordCard');
+            document.getElementById('recordCount').innerText = flightLogs.length; tbody.innerHTML = '';
+            
+            if (flightLogs.length === 0) {
+                tbody.innerHTML = `<tr id="emptyRow"><td colspan="5" class="px-4 py-8 text-center text-slate-500 font-medium"><i data-lucide="clock" class="w-8 h-8 mx-auto mb-2 opacity-40"></i>ยังไม่มีการบันทึกเวลา</td></tr>`;
+                topRecordCard.classList.add('hidden'); lucide.createIcons(); return;
+            }
+            const sortedLogs = [...flightLogs].sort((a, b) => b.seconds - a.seconds);
+            document.getElementById('topTeamName').textContent = sortedLogs[0].name; document.getElementById('topTime').innerText = sortedLogs[0].seconds.toFixed(2);
+            topRecordCard.classList.remove('hidden');
 
-        // ==========================================
-        // การจดทะเบียน Service Worker แบบปลอดภัย (ไฟล์จริง)
-        // ==========================================
+            sortedLogs.forEach((log, index) => {
+                const tr = document.createElement('tr'); tr.className = "hover:bg-slate-800/50 transition duration-150";
+                let rankStyle = index === 0 ? "text-amber-400 font-bold bg-amber-400/10 rounded-lg" : index === 1 ? "text-slate-300 font-bold bg-slate-300/10 rounded-lg" : index === 2 ? "text-orange-400 font-bold bg-orange-400/10 rounded-lg" : "text-slate-400";
+                
+                tr.innerHTML = `<td class="px-4 py-3 text-center"><div class="w-8 h-8 mx-auto flex items-center justify-center ${rankStyle}">${index + 1}</div></td>
+                    <td class="px-4 py-3 font-medium text-slate-200">${escapeHTML(log.name)}</td>
+                    <td class="px-4 py-3 text-right font-mono-num font-bold text-emerald-400">${log.seconds.toFixed(2)}</td>
+                    <td class="px-4 py-3 text-center text-slate-500 hidden sm:table-cell">${log.timestamp}</td>
+                    <td class="px-4 py-3 text-center"><button onclick="deleteLog(${log.id})" class="p-1.5 text-red-400 hover:text-red-300 hover:bg-red-500/20 rounded transition" title="ลบสถิตินี้"><i data-lucide="trash" class="w-4 h-4"></i></button></td>`;
+                tbody.appendChild(tr);
+            });
+            lucide.createIcons();
+        }
+
+        function copySummaryText() {
+            if (flightLogs.length === 0) return showToast("ไม่มีข้อมูลให้คัดลอก", "bg-amber-500");
+            let text = "🏆 สรุปผลเวลาบั้งไฟ (ทีมงานน้องมีตังค์) 🏆\n===================\n";
+            [...flightLogs].sort((a, b) => b.seconds - a.seconds).forEach((log, index) => { text += `${index + 1}. ${log.name} - ${log.seconds.toFixed(2)} วินาที\n`; });
+            text += "===================\nปลอดภัย 100% แม่นยำเที่ยงตรง";
+            navigator.clipboard.writeText(text).then(() => showToast("คัดลอกสรุปผลลงคลิปบอร์ดแล้ว", "bg-emerald-500")).catch(() => showToast("คัดลอกไม่สำเร็จ", "bg-red-500"));
+        }
+
+        function exportCSV() {
+            if (flightLogs.length === 0) return showToast("ไม่มีข้อมูลให้ออกรายงาน", "bg-amber-500");
+            let csvContent = "data:text/csv;charset=utf-8,%EF%BB%BFอันดับ,ชื่อค่าย/บั้งไฟ,เวลา (วินาที),เวลาที่บันทึก\n";
+            [...flightLogs].sort((a, b) => b.seconds - a.seconds).forEach((log, index) => {
+                csvContent += `"${index + 1}","${log.name.replace(/"/g, '""')}","${log.seconds.toFixed(2)}","${log.timestamp}"\n`;
+            });
+            const link = document.createElement("a"); link.setAttribute("href", encodeURI(csvContent)); link.setAttribute("download", `BangFai_Records_${new Date().getTime()}.csv`);
+            document.body.appendChild(link); link.click(); document.body.removeChild(link); showToast("ส่งออกไฟล์ CSV สำเร็จ", "bg-blue-500");
+        }
+
+        let toastTimeout;
+        function showToast(message, colorClass = 'bg-emerald-500') {
+            const toast = document.getElementById('toast'); document.getElementById('toastMessage').innerText = message;
+            toast.className = `fixed top-10 left-1/2 transform -translate-x-1/2 -translate-y-20 opacity-0 transition-all duration-300 text-white px-5 py-3 rounded-xl font-bold shadow-2xl flex items-center space-x-2 z-50 pointer-events-none ${colorClass}`;
+            setTimeout(() => { toast.classList.remove('-translate-y-20', 'opacity-0'); toast.classList.add('translate-y-0', 'opacity-100'); }, 10);
+            clearTimeout(toastTimeout); toastTimeout = setTimeout(() => { toast.classList.remove('translate-y-0', 'opacity-100'); toast.classList.add('-translate-y-20', 'opacity-0'); }, 3000);
+        }
+
+        function handleInputKey(e) { if (e.key === 'Enter') { e.preventDefault(); recordFlight(); } }
+        function toggleLegalModal() { document.getElementById('legalModal').classList.toggle('hidden'); }
+
+        document.addEventListener('keydown', (e) => {
+            const isInputFocused = document.activeElement && document.activeElement.tagName.toLowerCase() === 'input';
+            if ((e.code === 'Space' || e.key === 'VolumeUp' || e.key === 'VolumeDown') && !isInputFocused) { e.preventDefault(); toggleTimer(); }
+            else if ((e.code === 'KeyR' || e.key === 'r' || e.key === 'R') && !isInputFocused) { e.preventDefault(); resetTimer(); }
+            else if (e.code === 'Enter' && !isInputFocused) { e.preventDefault(); recordFlight(); }
+        });
+
+        window.onload = () => loadFromLocalStorage();
+
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
-                navigator.serviceWorker.register('sw.js')
-                    .then(registration => {
-                        console.log('ServiceWorker registration successful with scope: ', registration.scope);
-                    })
-                    .catch(err => {
-                        console.log('ServiceWorker registration failed: ', err);
-                    });
+                navigator.serviceWorker.register('sw.js').then(reg => console.log('ServiceWorker ready!', reg.scope)).catch(err => console.log('SW Fail:', err));
             });
         }
     </script>
