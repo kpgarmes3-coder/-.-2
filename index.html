@@ -10,8 +10,8 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="description" content="แอปพลิเคชันจับเวลาบั้งไฟมาตรฐานสูง แม่นยำระดับเสี้ยววินาที">
     
-    <!-- [SECURITY] Content-Security-Policy (CSP) ป้องกันแฮกเกอร์ฝังโค้ด -->
-    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.tailwindcss.com https://unpkg.com https://js.stripe.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; frame-src https://js.stripe.com; img-src 'self' data: https:; connect-src 'self' https://api.stripe.com;">
+    <!-- [SECURITY] Content-Security-Policy (CSP) ปรับปรุงให้รองรับรูปภาพ Local -->
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.tailwindcss.com https://unpkg.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: https:; connect-src 'self';">
     
     <title>𝙼𝚎𝚎𝚝𝚊𝚗𝚐.𝙱𝚢วิน จับเวลาบั้งไฟ (หน่วยวินาทีบริสุทธิ์)</title>
     
@@ -23,7 +23,6 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@700;800&family=Kanit:wght@400;600;700;900&display=swap" rel="stylesheet">
     <script src="https://unpkg.com/lucide@latest"></script>
-    <script async src="https://js.stripe.com/v3/buy-button.js"></script>
 
     <style>
         body { font-family: 'Kanit', sans-serif; background-color: #07090e; color: #f3f4f6; user-select: none; -webkit-user-select: none; touch-action: manipulation; }
@@ -202,18 +201,25 @@
                         </a>
                     </div>
                 </div>
+                
+                <!-- ส่วนสนับสนุนผลงานแก้ไขใหม่เป็น QR Code -->
                 <div class="space-y-4">
                     <h3 class="text-sm font-bold text-slate-300 uppercase tracking-wider mb-2">สนับสนุนผลงาน (Donate)</h3>
-                    <div class="bg-slate-950 border border-slate-800 rounded-xl p-5 flex flex-col items-center justify-center space-y-5 text-center h-full">
+                    <div class="bg-slate-950 border border-slate-800 rounded-xl p-5 flex flex-col items-center justify-center space-y-4 text-center h-full">
+                        <div class="bg-white p-2 rounded-2xl shadow-[0_0_15px_rgba(255,255,255,0.1)] inline-block w-48 max-w-full">
+                            <img src="42864.png" alt="QR Code รับชำระเงิน" class="w-full h-auto rounded-xl">
+                        </div>
                         <div class="w-full">
-                            <p class="text-xs text-slate-400 mb-3">สนับสนุนผ่านบัตรเครดิต/เดบิต (Stripe)</p>
-                            <div class="flex justify-center py-2 rounded-lg relative z-10">
-                                <stripe-buy-button buy-button-id="buy_btn_1ULtV7Dx0V34k6KYZAj8rVZx" publishable-key="pk_live_51U7FRlDx0V34k6KY7OuIk6MaTMWmenvuYa2iOYc4aSaig5LyXC0n3NpstjRzd9YhLjDfLykG1AmM5LW0IPKE9yUt003ZdeDNPD"></stripe-buy-button>
+                            <p class="text-sm font-bold text-amber-400 mb-1">ชื่อบัญชี: พีระพัฒน์ ทองระมุน</p>
+                            <p class="text-xs text-slate-400 mb-3">รหัสร้านค้า: 0611037042409201849</p>
+                            <div class="inline-flex items-center space-x-1.5 bg-emerald-500/10 text-emerald-400 text-xs px-3 py-1 rounded-full border border-emerald-500/30">
+                                <i data-lucide="heart" class="w-3.5 h-3.5 fill-emerald-400"></i>
+                                <span>ขอบคุณทุกการสนับสนุนครับ</span>
                             </div>
-                            <a href="https://buy.stripe.com/14A6oH04U4YV0fZ0WBgw000" target="_blank" rel="noopener noreferrer" class="text-[11px] text-blue-400 hover:underline mt-2 inline-block">ลิงก์สำรอง (หน้าชำระเงิน Stripe)</a>
                         </div>
                     </div>
                 </div>
+                
             </div>
         </div>
     </main>
@@ -320,7 +326,7 @@
             document.getElementById('mainStartText').innerText = 'เริ่มจับเวลา'; playBeep(600, 'triangle', 0.1); vibrate([30]);
         }
 
-        function handleDisplayClick(event) { if (event.target.tagName.toLowerCase() !== 'input' && event.target.tagName.toLowerCase() !== 'button' && event.target.tagName.toLowerCase() !== 'stripe-buy-button') toggleTimer(); }
+        function handleDisplayClick(event) { if (event.target.tagName.toLowerCase() !== 'input' && event.target.tagName.toLowerCase() !== 'button') toggleTimer(); }
 
         function toggleSound() {
             soundEnabled = !soundEnabled;
