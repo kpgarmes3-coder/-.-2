@@ -8,9 +8,7 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <title>𝙼𝚎𝚎𝚝𝚊𝚗𝚐.𝙱𝚢วิน จับเวลาบั้งไฟ (หน่วยวินาทีบริสุทธิ์)</title>
     
-    <!-- ลิงก์ไปยังไฟล์ Manifest เพื่อให้ติดตั้งเป็นแอปได้ -->
     <link rel="manifest" href="manifest.json">
-    
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@700;800&family=Kanit:wght@400;600;700;900&display=swap" rel="stylesheet">
     <script src="https://unpkg.com/lucide@latest"></script>
@@ -41,7 +39,7 @@
                 </h1>
                 <div class="mt-1.5 inline-flex items-center space-x-1.5 bg-emerald-500/10 text-emerald-400 text-xs px-2.5 py-0.5 rounded-full border border-emerald-500/30 font-bold">
                     <i data-lucide="shield-check" class="w-3.5 h-3.5"></i>
-                    <span>ทีมงานน้องมีตังค์ ปลอดภัย 100% แม่นยำเที่ยงตรง</span>
+                    <span>ทีมงานน้องมีตังค์ ปลอดภัย 100% แม่นยำเที่ยงตรง (ใช้งานออฟไลน์ได้)</span>
                 </div>
             </div>
         </div>
@@ -154,33 +152,53 @@
             </div>
         </div>
 
-        <!-- Social & Donate Section -->
+        <!-- Social & Donate Section (ช่องทางติดต่อผู้พัฒนา & สนับสนุน) -->
         <div class="bg-slate-900 border border-slate-800 rounded-2xl p-4 sm:p-6 shadow-lg space-y-6">
             <h2 class="text-lg font-bold text-amber-400 border-b border-slate-800 pb-3 flex items-center space-x-2">
-                <i data-lucide="users" class="w-6 h-6"></i><span>ช่องทางการติดต่อ และ สนับสนุน</span>
+                <i data-lucide="users" class="w-6 h-6"></i><span>ช่องทางการติดต่อ และ สนับสนุนทีมงาน</span>
             </h2>
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <!-- ติดต่อทีมงาน -->
                 <div class="space-y-4">
                     <h3 class="text-sm font-bold text-slate-300 uppercase tracking-wider mb-2">ทีมงานน้องมีตังค์ & ช่างเจียง</h3>
-                    <div class="flex flex-col gap-2">
-                        <a href="https://www.tiktok.com/@nongmeetang90?_r=1&_t=ZS-9ACftN1qbFE" target="_blank" class="flex items-center space-x-3 p-3 rounded-xl bg-slate-800/50 hover:bg-slate-800 border border-slate-700/50 transition"><i data-lucide="video" class="w-5 h-5 text-pink-400"></i><span class="text-sm font-medium text-slate-200">TikTok: ค่ายน้องมีตังค์</span></a>
-                        <a href="https://www.facebook.com/share/1HPX1BzfU9/" target="_blank" class="flex items-center space-x-3 p-3 rounded-xl bg-slate-800/50 hover:bg-slate-800 border border-slate-700/50 transition"><i data-lucide="facebook" class="w-5 h-5 text-blue-400"></i><span class="text-sm font-medium text-slate-200">Facebook: ช่างเจียง</span></a>
-                        <a href="tel:0914732609" class="flex items-center space-x-3 p-3 rounded-xl bg-slate-800/50 hover:bg-slate-800 border border-slate-700/50 transition"><i data-lucide="phone" class="w-5 h-5 text-emerald-400"></i><span class="text-sm font-medium text-slate-200">โทร: 0914732609 (ช่างเจียง)</span></a>
+                    <div class="flex flex-col gap-2.5">
+                        <a href="https://www.tiktok.com/@nongmeetang90?_r=1&_t=ZS-9ACftN1qbFE" target="_blank" class="flex items-center space-x-3 p-3.5 rounded-xl bg-slate-800/50 hover:bg-slate-800 border border-slate-700/50 transition">
+                            <i data-lucide="video" class="w-5 h-5 text-pink-400"></i>
+                            <div>
+                                <div class="text-xs text-slate-400">TikTok</div>
+                                <div class="text-sm font-medium text-slate-200">ค่ายน้องมีตังค์</div>
+                            </div>
+                        </a>
+                        <a href="https://www.facebook.com/share/1HPX1BzfU9/" target="_blank" class="flex items-center space-x-3 p-3.5 rounded-xl bg-slate-800/50 hover:bg-slate-800 border border-slate-700/50 transition">
+                            <i data-lucide="facebook" class="w-5 h-5 text-blue-400"></i>
+                            <div>
+                                <div class="text-xs text-slate-400">Facebook</div>
+                                <div class="text-sm font-medium text-slate-200">ช่างเจียง</div>
+                            </div>
+                        </a>
+                        <a href="tel:0914732609" class="flex items-center space-x-3 p-3.5 rounded-xl bg-slate-800/50 hover:bg-slate-800 border border-slate-700/50 transition">
+                            <i data-lucide="phone" class="w-5 h-5 text-emerald-400"></i>
+                            <div>
+                                <div class="text-xs text-slate-400">เบอร์โทรศัพท์ติดต่อ</div>
+                                <div class="text-sm font-medium text-slate-200">091-473-2609 (ช่างเจียง)</div>
+                            </div>
+                        </a>
                     </div>
                 </div>
+                <!-- สนับสนุน (Donate) -->
                 <div class="space-y-4">
-                    <h3 class="text-sm font-bold text-slate-300 uppercase tracking-wider mb-2">สนับสนุนผลงาน (Donate)</h3>
-                    <div class="bg-slate-950 border border-slate-800 rounded-xl p-5 flex flex-col items-center justify-center space-y-5 text-center h-full">
+                    <h3 class="text-sm font-bold text-slate-300 uppercase tracking-wider mb-2">สนับสนุนผลงานผู้พัฒนา (Donate)</h3>
+                    <div class="bg-slate-950 border border-slate-800 rounded-xl p-5 flex flex-col items-center justify-center space-y-4 text-center h-full">
                         <div class="w-full">
                             <p class="text-xs text-slate-400 mb-3">สนับสนุนผ่านบัตรเครดิต/เดบิต (Stripe)</p>
                             <div class="flex justify-center py-2 rounded-lg relative z-10">
                                 <stripe-buy-button buy-button-id="buy_btn_1ULtV7Dx0V34k6KYZAj8rVZx" publishable-key="pk_live_51U7FRlDx0V34k6KY7OuIk6MaTMWmenvuYa2iOYc4aSaig5LyXC0n3NpstjRzd9YhLjDfLykG1AmM5LW0IPKE9yUt003ZdeDNPD"></stripe-buy-button>
                             </div>
-                            <a href="https://buy.stripe.com/14A6oH04U4YV0fZ0WBgw000" target="_blank" class="text-[11px] text-blue-400 hover:underline mt-2 inline-block">ลิงก์สำรอง (หน้าชำระเงิน)</a>
+                            <a href="https://buy.stripe.com/14A6oH04U4YV0fZ0WBgw000" target="_blank" class="text-[11px] text-blue-400 hover:underline mt-2 inline-block">ลิงก์สำรองชำระเงิน</a>
                         </div>
                         <div class="w-full pt-4 border-t border-slate-800">
-                            <p class="text-xs text-slate-400 mb-3">สแกน QR Code เพื่อสนับสนุนผู้พัฒนา</p>
-                            <img src="42854.png" alt="QR Code" class="mx-auto max-w-[200px] w-full rounded-xl border border-slate-700 shadow-md">
+                            <p class="text-xs text-slate-400 mb-3">สแกน QR Code พร้อมเพย์ / ธนาคาร</p>
+                            <img src="42854.png" alt="QR Code สนับสนุน" class="mx-auto max-w-[180px] w-full rounded-xl border border-slate-700 shadow-md">
                         </div>
                     </div>
                 </div>
@@ -195,7 +213,6 @@
     </footer>
 
     <script>
-        // Core Logic
         let startTime = 0, elapsedTime = 0, timerInterval = null, isRunning = false, soundEnabled = true, flightLogs = [];
         lucide.createIcons();
 
@@ -321,7 +338,7 @@
             renderLogsTable();
         };
 
-        // ลงทะเบียน Service Worker สำหรับการใช้งาน Offline
+        // ลงทะเบียน Service Worker สำหรับการใช้งาน Offline กลางทุ่งนา
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
                 navigator.serviceWorker.register('/sw.js').then(registration => {
